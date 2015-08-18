@@ -25,10 +25,10 @@
 
 #import "CHTumblrMenuView.h"
 #define CHTumblrMenuViewTag 1999
-#define CHTumblrMenuViewImageHeight 90
-#define CHTumblrMenuViewTitleHeight 20
-#define CHTumblrMenuViewVerticalPadding 10
-#define CHTumblrMenuViewHorizontalMargin 10
+#define CHTumblrMenuViewImageHeight 72
+#define CHTumblrMenuViewTitleHeight 0
+#define CHTumblrMenuViewVerticalPadding 20
+#define CHTumblrMenuViewHorizontalMargin 28
 #define CHTumblrMenuViewRriseAnimationID @"CHTumblrMenuViewRriseAnimationID"
 #define CHTumblrMenuViewDismissAnimationID @"CHTumblrMenuViewDismissAnimationID"
 #define CHTumblrMenuViewAnimationTime 0.36
@@ -84,7 +84,7 @@
         [self addGestureRecognizer:ges];
         self.backgroundColor = [UIColor clearColor];
         backgroundView_ = [[UIImageView alloc] initWithFrame:self.bounds];
-        backgroundView_.backgroundColor = TumblrBlue;
+        backgroundView_.backgroundColor = [UIColor clearColor];
         backgroundView_.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         [self addSubview:backgroundView_];
         buttons_ = [[NSMutableArray alloc] initWithCapacity:6];
@@ -113,7 +113,7 @@
     NSUInteger rowIndex = index / columnCount;
 
     CGFloat itemHeight = (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * CHTumblrMenuViewHorizontalMargin:0);
-    CGFloat offsetY = (self.bounds.size.height - itemHeight) / 2.0;
+    CGFloat offsetY = self.bounds.size.height - itemHeight - CHTumblrMenuViewVerticalPadding;
     CGFloat verticalPadding = (self.bounds.size.width - CHTumblrMenuViewHorizontalMargin * 2 - CHTumblrMenuViewImageHeight * 3) / 2.0;
     
     CGFloat offsetX = CHTumblrMenuViewHorizontalMargin;
@@ -121,7 +121,6 @@
     
     offsetY += (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight + CHTumblrMenuViewVerticalPadding) * rowIndex;
 
-    
     return CGRectMake(offsetX, offsetY, CHTumblrMenuViewImageHeight, (CHTumblrMenuViewImageHeight+CHTumblrMenuViewTitleHeight));
 
 }
@@ -155,11 +154,23 @@
 
 - (void)dismiss:(id)sender
 {
+    UITapGestureRecognizer *ges = nil;
+    
+    if (self.gestureRecognizers.count) {
+        ges = self.gestureRecognizers.firstObject;
+        ges.enabled = NO;
+    }
+    
+    
     [self dropAnimation];
     double delayInSeconds = CHTumblrMenuViewAnimationTime  + CHTumblrMenuViewAnimationInterval * (buttons_.count + 1);
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [self removeFromSuperview];
+        
+        if (ges) {
+            ges.enabled = YES;
+        }
     });
 }
 
@@ -191,7 +202,7 @@
         CGPoint fromPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
-        
+
         double delayInSeconds = rowIndex * columnCount * CHTumblrMenuViewAnimationInterval;
         if (!columnIndex) {
             delayInSeconds += CHTumblrMenuViewAnimationInterval;
@@ -221,13 +232,16 @@
 - (void)dropAnimation
 {
     NSUInteger columnCount = 3;
+    NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
+    
+    
     for (NSUInteger index = 0; index < buttons_.count; index++) {
         CHTumblrMenuItemButton *button = buttons_[index];
         CGRect frame = [self frameForButtonAtIndex:index];
         NSUInteger rowIndex = index / columnCount;
         NSUInteger columnIndex = index % columnCount;
 
-        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y -  (rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         CGPoint fromPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
@@ -274,10 +288,12 @@
     else if([anim valueForKey:CHTumblrMenuViewDismissAnimationID]) {
         NSUInteger index = [[anim valueForKey:CHTumblrMenuViewDismissAnimationID] unsignedIntegerValue];
         NSUInteger rowIndex = index / columnCount;
+        NSUInteger columnCount = 3;
+        NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
 
         UIView *view = buttons_[index];
         CGRect frame = [self frameForButtonAtIndex:index];
-        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y -  (rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         view.layer.position = toPosition;
     }
