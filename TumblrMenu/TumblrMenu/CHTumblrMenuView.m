@@ -25,10 +25,8 @@
 
 #import "CHTumblrMenuView.h"
 #define CHTumblrMenuViewTag 1999
-#define CHTumblrMenuViewImageHeight 72
 #define CHTumblrMenuViewTitleHeight 0
 #define CHTumblrMenuViewVerticalPadding 20
-#define CHTumblrMenuViewHorizontalMargin 28
 #define CHTumblrMenuViewRriseAnimationID @"CHTumblrMenuViewRriseAnimationID"
 #define CHTumblrMenuViewDismissAnimationID @"CHTumblrMenuViewDismissAnimationID"
 #define CHTumblrMenuViewAnimationTime 0.36
@@ -61,8 +59,8 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    self.imageView.frame = CGRectMake(0, 0, CHTumblrMenuViewImageHeight, CHTumblrMenuViewImageHeight);
-    self.titleLabel.frame = CGRectMake(0, CHTumblrMenuViewImageHeight, CHTumblrMenuViewImageHeight, CHTumblrMenuViewTitleHeight);
+    self.imageView.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.width);
+    self.titleLabel.frame = CGRectMake(0, self.bounds.size.width, self.bounds.size.width, CHTumblrMenuViewTitleHeight);
 }
 @end
 
@@ -89,7 +87,9 @@
         [self addSubview:backgroundView_];
         buttons_ = [[NSMutableArray alloc] initWithCapacity:6];
         
-        
+        self.columnPerRow = 3;
+        self.imageHeight = 72.0;
+        self.spacing = 24.0;
     }
     return self;
 }
@@ -106,22 +106,22 @@
 
 - (CGRect)frameForButtonAtIndex:(NSUInteger)index
 {
-    NSUInteger columnCount = 3;
+    NSUInteger columnCount = self.columnPerRow;
     NSUInteger columnIndex =  index % columnCount;
 
     NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
     NSUInteger rowIndex = index / columnCount;
 
-    CGFloat itemHeight = (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * CHTumblrMenuViewHorizontalMargin:0);
+    CGFloat horizontalMargin = (self.bounds.size.width - columnCount * self.imageHeight - (columnCount - 1) * self.spacing) / 2;
+    CGFloat itemHeight = (self.imageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * horizontalMargin:0);
     CGFloat offsetY = self.bounds.size.height - itemHeight - CHTumblrMenuViewVerticalPadding;
-    CGFloat verticalPadding = (self.bounds.size.width - CHTumblrMenuViewHorizontalMargin * 2 - CHTumblrMenuViewImageHeight * 3) / 2.0;
-    
-    CGFloat offsetX = CHTumblrMenuViewHorizontalMargin;
-    offsetX += (CHTumblrMenuViewImageHeight+ verticalPadding) * columnIndex;
-    
-    offsetY += (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight + CHTumblrMenuViewVerticalPadding) * rowIndex;
 
-    return CGRectMake(offsetX, offsetY, CHTumblrMenuViewImageHeight, (CHTumblrMenuViewImageHeight+CHTumblrMenuViewTitleHeight));
+    CGFloat offsetX = horizontalMargin;
+    offsetX += (self.imageHeight+ self.spacing) * columnIndex;
+    
+    offsetY += (self.imageHeight + CHTumblrMenuViewTitleHeight + CHTumblrMenuViewVerticalPadding) * rowIndex;
+
+    return CGRectMake(offsetX, offsetY, self.imageHeight, (self.imageHeight+CHTumblrMenuViewTitleHeight));
 
 }
 
@@ -189,7 +189,7 @@
 
 - (void)riseAnimation
 {
-    NSUInteger columnCount = 3;
+    NSUInteger columnCount = self.columnPerRow;
     NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
 
 
@@ -199,9 +199,9 @@
         CGRect frame = [self frameForButtonAtIndex:index];
         NSUInteger rowIndex = index / columnCount;
         NSUInteger columnIndex = index % columnCount;
-        CGPoint fromPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint fromPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
-        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
 
         double delayInSeconds = rowIndex * columnCount * CHTumblrMenuViewAnimationInterval;
         if (!columnIndex) {
@@ -231,7 +231,7 @@
 
 - (void)dropAnimation
 {
-    NSUInteger columnCount = 3;
+    NSUInteger columnCount = self.columnPerRow;
     NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
     
     
@@ -241,9 +241,9 @@
         NSUInteger rowIndex = index / columnCount;
         NSUInteger columnIndex = index % columnCount;
 
-        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
-        CGPoint fromPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint fromPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         double delayInSeconds = rowIndex * columnCount * CHTumblrMenuViewAnimationInterval;
         if (!columnIndex) {
@@ -273,12 +273,12 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
-    NSUInteger columnCount = 3;
+    NSUInteger columnCount = self.columnPerRow;
     if([anim valueForKey:CHTumblrMenuViewRriseAnimationID]) {
         NSUInteger index = [[anim valueForKey:CHTumblrMenuViewRriseAnimationID] unsignedIntegerValue];
         UIView *view = buttons_[index];
         CGRect frame = [self frameForButtonAtIndex:index];
-        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         CGFloat toAlpha = 1.0;
         
         view.layer.position = toPosition;
@@ -288,12 +288,12 @@
     else if([anim valueForKey:CHTumblrMenuViewDismissAnimationID]) {
         NSUInteger index = [[anim valueForKey:CHTumblrMenuViewDismissAnimationID] unsignedIntegerValue];
         NSUInteger rowIndex = index / columnCount;
-        NSUInteger columnCount = 3;
+        NSUInteger columnCount = self.columnPerRow;
         NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
 
         UIView *view = buttons_[index];
         CGRect frame = [self frameForButtonAtIndex:index];
-        CGPoint toPosition = CGPointMake(frame.origin.x + CHTumblrMenuViewImageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (CHTumblrMenuViewImageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         view.layer.position = toPosition;
     }
