@@ -89,7 +89,7 @@
         
         self.columnPerRow = 3;
         self.imageHeight = 72.0;
-        self.spacing = 24.0;
+        self.horizontalMargin = 28.0;
     }
     return self;
 }
@@ -112,12 +112,12 @@
     NSUInteger rowCount = buttons_.count / columnCount + (buttons_.count%columnCount>0?1:0);
     NSUInteger rowIndex = index / columnCount;
 
-    CGFloat horizontalMargin = (self.bounds.size.width - columnCount * self.imageHeight - (columnCount - 1) * self.spacing) / 2;
-    CGFloat itemHeight = (self.imageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * horizontalMargin:0);
+    CGFloat itemHeight = (self.imageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * self.horizontalMargin:0);
     CGFloat offsetY = self.bounds.size.height - itemHeight - CHTumblrMenuViewVerticalPadding;
+    CGFloat verticalPadding = (self.bounds.size.width - self.horizontalMargin * (columnCount - 1) - self.imageHeight * columnCount) / 2.0;
 
-    CGFloat offsetX = horizontalMargin;
-    offsetX += (self.imageHeight+ self.spacing) * columnIndex;
+    CGFloat offsetX = self.horizontalMargin;
+    offsetX += (self.imageHeight+ verticalPadding) * columnIndex;
     
     offsetY += (self.imageHeight + CHTumblrMenuViewTitleHeight + CHTumblrMenuViewVerticalPadding) * rowIndex;
 

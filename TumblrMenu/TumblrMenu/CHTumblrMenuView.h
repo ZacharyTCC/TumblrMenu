@@ -30,7 +30,7 @@ typedef void (^CHTumblrMenuViewSelectedBlock)(void);
 @interface CHTumblrMenuView : UIView<UIGestureRecognizerDelegate>
 @property (nonatomic, assign) NSInteger columnPerRow;
 @property (nonatomic, assign) CGFloat imageHeight;
-@property (nonatomic, assign) CGFloat spacing;
+@property (nonatomic, assign) CGFloat horizontalMargin;
 @property (nonatomic, readonly)UIImageView *backgroundImgView;
 - (void)addMenuItemWithTitle:(NSString*)title andIcon:(UIImage*)icon andSelectedBlock:(CHTumblrMenuViewSelectedBlock)block;
 - (void)show;
