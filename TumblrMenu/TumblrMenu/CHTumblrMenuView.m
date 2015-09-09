@@ -114,7 +114,7 @@
 
     CGFloat itemHeight = (self.imageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * self.horizontalMargin:0);
     CGFloat offsetY = self.bounds.size.height - itemHeight - CHTumblrMenuViewVerticalPadding;
-    CGFloat verticalPadding = (self.bounds.size.width - self.horizontalMargin * (columnCount - 1) - self.imageHeight * columnCount) / 2.0;
+    CGFloat verticalPadding = (self.bounds.size.width - self.horizontalMargin * 2 - self.imageHeight * columnCount) / (columnCount - 1);
 
     CGFloat offsetX = self.horizontalMargin;
     offsetX += (self.imageHeight+ verticalPadding) * columnIndex;
