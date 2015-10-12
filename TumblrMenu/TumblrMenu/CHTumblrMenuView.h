@@ -31,7 +31,10 @@ typedef void (^CHTumblrMenuViewSelectedBlock)(void);
 @property (nonatomic, assign) NSInteger columnPerRow;
 @property (nonatomic, assign) CGFloat imageHeight;
 @property (nonatomic, assign) CGFloat horizontalMargin;
-@property (nonatomic, readonly)UIImageView *backgroundImgView;
+@property (nonatomic, readonly) UIImageView *backgroundImgView;
+
+@property (nonatomic, strong) NSMutableArray *buttons;
+
 - (void)addMenuItemWithTitle:(NSString*)title andIcon:(UIImage*)icon andSelectedBlock:(CHTumblrMenuViewSelectedBlock)block;
 - (void)show;
 @end
