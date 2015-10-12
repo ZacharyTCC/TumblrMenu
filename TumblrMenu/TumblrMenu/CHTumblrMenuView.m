@@ -110,14 +110,19 @@
 
     NSUInteger rowCount = self.buttons.count / columnCount + (self.buttons.count%columnCount>0?1:0);
     NSUInteger rowIndex = index / columnCount;
-
+    
+    CGFloat offsetX = 0.0;
+    if (columnCount > 1) {
+        CGFloat horizontalPadding = (self.bounds.size.width - self.horizontalMargin * 2 - self.imageHeight * columnCount) / (columnCount - 1);
+        
+        offsetX += self.horizontalMargin + (self.imageHeight + horizontalPadding) * columnIndex;
+    }
+    else {
+        offsetX = (self.bounds.size.width - self.imageHeight) / 2;
+    }
+    
     CGFloat itemHeight = (self.imageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * self.horizontalMargin:0);
     CGFloat offsetY = self.bounds.size.height - itemHeight - CHTumblrMenuViewVerticalPadding;
-    CGFloat verticalPadding = (self.bounds.size.width - self.horizontalMargin * 2 - self.imageHeight * columnCount) / (columnCount - 1);
-
-    CGFloat offsetX = self.horizontalMargin;
-    offsetX += (self.imageHeight+ verticalPadding) * columnIndex;
-    
     offsetY += (self.imageHeight + CHTumblrMenuViewTitleHeight + CHTumblrMenuViewVerticalPadding) * rowIndex;
 
     return CGRectMake(offsetX, offsetY, self.imageHeight, (self.imageHeight+CHTumblrMenuViewTitleHeight));
