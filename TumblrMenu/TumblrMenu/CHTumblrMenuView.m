@@ -25,7 +25,7 @@
 
 #import "CHTumblrMenuView.h"
 #define CHTumblrMenuViewTag 1999
-#define CHTumblrMenuViewTitleHeight 20
+#define CHTumblrMenuViewTitleHeight 30
 #define CHTumblrMenuViewVerticalPadding 20
 #define CHTumblrMenuViewRriseAnimationID @"CHTumblrMenuViewRriseAnimationID"
 #define CHTumblrMenuViewDismissAnimationID @"CHTumblrMenuViewDismissAnimationID"

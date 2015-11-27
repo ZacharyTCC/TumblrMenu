@@ -35,6 +35,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor brownColor];
+    
 	// Do any additional setup after loading the view, typically from a nib.
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     [button setImage:[UIImage imageNamed:@"tab_bar_button_compose_selected.png"] forState:UIControlStateHighlighted];
