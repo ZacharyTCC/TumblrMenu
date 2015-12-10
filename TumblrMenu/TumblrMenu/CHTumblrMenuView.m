@@ -50,6 +50,7 @@
     [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     button.titleLabel.textAlignment = NSTextAlignmentCenter;
     button.titleLabel.font = [UIFont systemFontOfSize:12.0];
+    button.titleLabel.numberOfLines = 0;
     
     button.selectedBlock = block;
  
