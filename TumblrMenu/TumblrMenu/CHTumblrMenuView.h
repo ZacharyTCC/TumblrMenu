@@ -28,10 +28,14 @@ typedef void (^CHTumblrMenuViewSelectedBlock)(void);
 
 
 @interface CHTumblrMenuView : UIView<UIGestureRecognizerDelegate>
+
+@property (nonatomic, strong) NSString *message;
+
 @property (nonatomic, assign) NSInteger columnPerRow;
-@property (nonatomic, assign) CGFloat imageHeight;
-@property (nonatomic, assign) CGFloat horizontalMargin;
+@property (nonatomic, assign) CGFloat iconHeight;
+
 @property (nonatomic, readonly) UIImageView *backgroundImgView;
+@property (nonatomic, readonly) UILabel *messageLabel;
 
 @property (nonatomic, strong) NSMutableArray *buttons;
 

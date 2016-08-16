@@ -89,8 +89,7 @@
         self.buttons = [[NSMutableArray alloc] initWithCapacity:6];
         
         self.columnPerRow = 3;
-        self.imageHeight = 72.0;
-        self.horizontalMargin = 28.0;
+        self.iconHeight = 72.0;
     }
     return self;
 }
@@ -107,27 +106,21 @@
 
 - (CGRect)frameForButtonAtIndex:(NSUInteger)index
 {
-    NSUInteger columnCount = self.columnPerRow;
+    NSUInteger rowCount = ceil((CGFloat)self.buttons.count / (CGFloat)self.columnPerRow);
+    NSUInteger rowIndex = index / self.columnPerRow;
+    
+    NSUInteger lastRowColumnCount = ((self.buttons.count % self.columnPerRow) != 0) ? self.buttons.count % self.columnPerRow : self.columnPerRow;
+    NSUInteger columnCount = (rowCount == (rowIndex + 1)) ? lastRowColumnCount : self.columnPerRow;
     NSUInteger columnIndex =  index % columnCount;
-
-    NSUInteger rowCount = self.buttons.count / columnCount + (self.buttons.count%columnCount>0?1:0);
-    NSUInteger rowIndex = index / columnCount;
     
-    CGFloat offsetX = 0.0;
-    if (columnCount > 1) {
-        CGFloat horizontalPadding = (self.bounds.size.width - self.horizontalMargin * 2 - self.imageHeight * columnCount) / (columnCount - 1);
-        
-        offsetX += self.horizontalMargin + (self.imageHeight + horizontalPadding) * columnIndex;
-    }
-    else {
-        offsetX = (self.bounds.size.width - self.imageHeight) / 2;
-    }
+    CGFloat spacing = (self.bounds.size.width - self.iconHeight * columnCount) / (columnCount + 1);
     
-    CGFloat itemHeight = (self.imageHeight + CHTumblrMenuViewTitleHeight) * rowCount + (rowCount > 1?(rowCount - 1) * self.horizontalMargin:0);
-    CGFloat offsetY = self.bounds.size.height - itemHeight - CHTumblrMenuViewVerticalPadding;
-    offsetY += (self.imageHeight + CHTumblrMenuViewTitleHeight + CHTumblrMenuViewVerticalPadding) * rowIndex;
+    CGFloat offsetX = spacing + (self.iconHeight + spacing) * columnIndex;
+    
+    CGFloat itemHeight = (self.iconHeight + CHTumblrMenuViewTitleHeight);
+    CGFloat offsetY = self.bounds.size.height - ((itemHeight + CHTumblrMenuViewVerticalPadding) * (rowCount - rowIndex));
 
-    return CGRectMake(offsetX, offsetY, self.imageHeight, (self.imageHeight+CHTumblrMenuViewTitleHeight));
+    return CGRectMake(offsetX, offsetY, self.iconHeight, itemHeight);
 
 }
 
@@ -195,6 +188,41 @@
 
 - (void)riseAnimation
 {
+    if (_message.length && self.buttons.count) {
+        if (!_messageLabel) {
+            _messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+            _messageLabel.font = [UIFont systemFontOfSize:17.0];
+            _messageLabel.textColor = [UIColor whiteColor];
+            _messageLabel.textAlignment = NSTextAlignmentCenter;
+            _messageLabel.numberOfLines = 0;
+            _messageLabel.layer.opacity = 0.0;
+            [self addSubview:self.messageLabel];
+        }
+        
+        _messageLabel.text = _message;
+        
+        CGRect firstButtonFrame = [self frameForButtonAtIndex:0];
+        
+        CGFloat messagePadding = 20.0;
+        
+        CGFloat messageWidth = (self.bounds.size.width - messagePadding * 2);
+        
+        CGSize messageSize = [_messageLabel sizeThatFits:CGSizeMake(messageWidth, CGFLOAT_MAX)];
+        
+        _messageLabel.frame = CGRectMake(messagePadding, firstButtonFrame.origin.y - CHTumblrMenuViewVerticalPadding - messageSize.height, messageWidth, messageSize.height);
+        
+        CABasicAnimation *opacityAnimation;
+        opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        opacityAnimation.fromValue = [NSNumber numberWithFloat:0.0];
+        opacityAnimation.toValue = [NSNumber numberWithFloat:1.0];
+        opacityAnimation.duration = CHTumblrMenuViewAnimationTime;
+        opacityAnimation.beginTime = CACurrentMediaTime() + CHTumblrMenuViewAnimationTime;
+        opacityAnimation.fillMode = kCAFillModeForwards;
+        opacityAnimation.removedOnCompletion = NO;
+        [_messageLabel.layer addAnimation:opacityAnimation forKey:@"riseAnimation"];
+    }
+    
+    
     NSUInteger columnCount = self.columnPerRow;
     NSUInteger rowCount = self.buttons.count / columnCount + (self.buttons.count%columnCount>0?1:0);
 
@@ -205,9 +233,9 @@
         CGRect frame = [self frameForButtonAtIndex:index];
         NSUInteger rowIndex = index / columnCount;
         NSUInteger columnIndex = index % columnCount;
-        CGPoint fromPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint fromPosition = CGPointMake(frame.origin.x + self.iconHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.iconHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
-        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.iconHeight / 2.0,frame.origin.y + (self.iconHeight + CHTumblrMenuViewTitleHeight) / 2.0);
 
         double delayInSeconds = rowIndex * columnCount * CHTumblrMenuViewAnimationInterval;
         if (!columnIndex) {
@@ -237,6 +265,21 @@
 
 - (void)dropAnimation
 {
+    if (_messageLabel) {
+        CABasicAnimation *opacityAnimation;
+        opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        opacityAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+        opacityAnimation.toValue = [NSNumber numberWithFloat:0.0];
+        opacityAnimation.duration = CHTumblrMenuViewAnimationTime;
+        opacityAnimation.beginTime = CACurrentMediaTime() + CHTumblrMenuViewAnimationTime;
+        opacityAnimation.fillMode = kCAFillModeBackwards;
+        opacityAnimation.removedOnCompletion = NO;
+        [_messageLabel.layer addAnimation:opacityAnimation forKey:@"riseAnimation"];
+        
+        
+    }
+    
+    
     NSUInteger columnCount = self.columnPerRow;
     NSUInteger rowCount = self.buttons.count / columnCount + (self.buttons.count%columnCount>0?1:0);
     
@@ -247,9 +290,9 @@
         NSUInteger rowIndex = index / columnCount;
         NSUInteger columnIndex = index % columnCount;
 
-        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.iconHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.iconHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
-        CGPoint fromPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint fromPosition = CGPointMake(frame.origin.x + self.iconHeight / 2.0,frame.origin.y + (self.iconHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         double delayInSeconds = rowIndex * columnCount * CHTumblrMenuViewAnimationInterval;
         if (!columnIndex) {
@@ -284,7 +327,7 @@
         NSUInteger index = [[anim valueForKey:CHTumblrMenuViewRriseAnimationID] unsignedIntegerValue];
         UIView *view = self.buttons[index];
         CGRect frame = [self frameForButtonAtIndex:index];
-        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.iconHeight / 2.0,frame.origin.y + (self.iconHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         CGFloat toAlpha = 1.0;
         
         view.layer.position = toPosition;
@@ -299,7 +342,7 @@
 
         UIView *view = self.buttons[index];
         CGRect frame = [self frameForButtonAtIndex:index];
-        CGPoint toPosition = CGPointMake(frame.origin.x + self.imageHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.imageHeight + CHTumblrMenuViewTitleHeight) / 2.0);
+        CGPoint toPosition = CGPointMake(frame.origin.x + self.iconHeight / 2.0,frame.origin.y +  (rowCount - rowIndex + 2)*200 + (self.iconHeight + CHTumblrMenuViewTitleHeight) / 2.0);
         
         view.layer.position = toPosition;
     }
