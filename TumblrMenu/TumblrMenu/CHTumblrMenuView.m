@@ -271,7 +271,7 @@
         opacityAnimation.fromValue = [NSNumber numberWithFloat:1.0];
         opacityAnimation.toValue = [NSNumber numberWithFloat:0.0];
         opacityAnimation.duration = CHTumblrMenuViewAnimationTime;
-        opacityAnimation.beginTime = CACurrentMediaTime() + CHTumblrMenuViewAnimationTime;
+        opacityAnimation.beginTime = CHTumblrMenuViewAnimationTime;
         opacityAnimation.fillMode = kCAFillModeBackwards;
         opacityAnimation.removedOnCompletion = NO;
         [_messageLabel.layer addAnimation:opacityAnimation forKey:@"riseAnimation"];

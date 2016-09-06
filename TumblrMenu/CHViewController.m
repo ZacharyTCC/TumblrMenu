@@ -51,12 +51,6 @@
     CHTumblrMenuView *menuView = [[CHTumblrMenuView alloc] init];
     
     menuView.columnPerRow = 3;
-    menuView.imageHeight = 72.0;
-    menuView.horizontalMargin = 28.0;
-    
-//    menuView.columnPerRow = 4;
-//    menuView.imageHeight = 60.0;
-//    menuView.horizontalMargin = 16.0;
     
     [menuView addMenuItemWithTitle:@"Text" andIcon:[UIImage imageNamed:@"post_type_bubble_text.png"] andSelectedBlock:^{
         NSLog(@"Text selected");
